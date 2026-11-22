@@ -1,0 +1,165 @@
+# NexusAI: 11 containers on one private network.
+#
+#   docker compose up --build
+#   Dashboard  http://localhost:5173
+#   API docs   http://localhost:8000/docs
+#
+# Values such as LLM_PROVIDER and API keys are read from the .env file next to
+# this file (Compose substitutes ${VAR} from it). Only the backend and the
+# dashboard publish ports to the host: agents and MCP servers are reachable
+# only from inside the network.
+
+x-app: &app
+  build: .
+  image: nexusai:latest
+  restart: unless-stopped
+
+x-llm-env: &llm-env
+  LLM_PROVIDER: ${LLM_PROVIDER:-offline}
+  LLM_MODEL: ${LLM_MODEL:-}
+  LLM_TEMPERATURE: ${LLM_TEMPERATURE:-0.2}
+  LLM_TIMEOUT_SECONDS: ${LLM_TIMEOUT_SECONDS:-60}
+  LLM_MAX_RETRIES: ${LLM_MAX_RETRIES:-2}
+  GROQ_API_KEY: ${GROQ_API_KEY:-}
+  GOOGLE_API_KEY: ${GOOGLE_API_KEY:-}
+  OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+  LLM_PRICE_INPUT_PER_1M: ${LLM_PRICE_INPUT_PER_1M:-0}
+  LLM_PRICE_OUTPUT_PER_1M: ${LLM_PRICE_OUTPUT_PER_1M:-0}
+  LANGFUSE_PUBLIC_KEY: ${LANGFUSE_PUBLIC_KEY:-}
+  LANGFUSE_SECRET_KEY: ${LANGFUSE_SECRET_KEY:-}
+  LANGFUSE_HOST: ${LANGFUSE_HOST:-https://cloud.langfuse.com}
+  LOG_LEVEL: ${LOG_LEVEL:-INFO}
+  # Shared secret between backend, agents and MCP servers. Required.
+  INTERNAL_API_TOKEN: ${INTERNAL_API_TOKEN:?Set INTERNAL_API_TOKEN in .env (any long random string)}
+
+# What every agent needs: the LLM, its own public URL list, the MCP servers
+# and the shared Redis cache.
+x-agent-env: &agent-env
+  <<: *llm-env
+  AGENT_HOST: 0.0.0.0
+  MARKET_AGENT_URL: http://agent-market:9001
+  COMPETITOR_AGENT_URL: http://agent-competitor:9002
+  CUSTOMER_AGENT_URL: http://agent-customer:9003
+  STRATEGY_AGENT_URL: http://agent-strategy:9004
+  MCP_WEB_URL: http://mcp-web:9101/mcp
+  MCP_BUSINESS_URL: http://mcp-business:9102/mcp
+  MCP_CALCULATOR_URL: http://mcp-calculator:9103/mcp
+  REDIS_URL: redis://redis:6379/0
+  TOOL_TIMEOUT_SECONDS: ${TOOL_TIMEOUT_SECONDS:-25}
+  MAX_RETRIES: ${MAX_RETRIES:-2}
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: nexusai
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-nexusai}
+      POSTGRES_DB: nexusai
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U nexusai -d nexusai"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  # ------------------------------------------------------------ MCP servers
+  mcp-web:
+    <<: *app
+    command: python -m protocols.mcp.servers.web_research
+    environment:
+      MCP_HOST: 0.0.0.0
+      MCP_PORT: "9101"
+      INTERNAL_API_TOKEN: ${INTERNAL_API_TOKEN:?Set INTERNAL_API_TOKEN in .env}
+      WEB_SEARCH_BACKEND: ${WEB_SEARCH_BACKEND:-ddgs}
+
+  mcp-business:
+    <<: *app
+    command: python -m protocols.mcp.servers.business_data
+    environment:
+      MCP_HOST: 0.0.0.0
+      MCP_PORT: "9102"
+      INTERNAL_API_TOKEN: ${INTERNAL_API_TOKEN:?Set INTERNAL_API_TOKEN in .env}
+
+  mcp-calculator:
+    <<: *app
+    command: python -m protocols.mcp.servers.market_calculator
+    environment:
+      MCP_HOST: 0.0.0.0
+      MCP_PORT: "9103"
+      INTERNAL_API_TOKEN: ${INTERNAL_API_TOKEN:?Set INTERNAL_API_TOKEN in .env}
+
+  # ----------------------------------------------------------- A2A agents
+  agent-market:
+    <<: *app
+    command: python -m agents.market_research.server
+    environment: *agent-env
+    depends_on: [mcp-web, mcp-calculator, redis]
+
+  agent-competitor:
+    <<: *app
+    command: python -m agents.competitor.server
+    environment: *agent-env
+    depends_on: [mcp-web, mcp-business, redis]
+
+  agent-customer:
+    <<: *app
+    command: python -m agents.customer_insights.server
+    environment: *agent-env
+    depends_on: [mcp-web, redis]
+
+  agent-strategy:
+    <<: *app
+    command: python -m agents.strategy.server
+    environment: *agent-env
+    depends_on: [mcp-calculator]
+
+  # ------------------------------------------------- backend and dashboard
+  backend:
+    <<: *app
+    command: uvicorn backend.main:app --host 0.0.0.0 --port 8000
+    environment:
+      <<: *agent-env
+      ORCHESTRATION_MODE: a2a
+      DATABASE_URL: postgresql+asyncpg://nexusai:${POSTGRES_PASSWORD:-nexusai}@postgres:5432/nexusai
+      AGENT_TIMEOUT_SECONDS: ${AGENT_TIMEOUT_SECONDS:-180}
+      ALLOW_SIGNUP: ${ALLOW_SIGNUP:-true}
+      SESSION_DAYS: ${SESSION_DAYS:-7}
+      # Set to true when the site is served over HTTPS.
+      COOKIE_SECURE: ${COOKIE_SECURE:-false}
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      agent-market:
+        condition: service_started
+      agent-competitor:
+        condition: service_started
+      agent-customer:
+        condition: service_started
+      agent-strategy:
+        condition: service_started
+
+  frontend:
+    build: ./frontend
+    image: nexusai-frontend:latest
+    restart: unless-stopped
+    ports:
+      - "5173:80"
+    depends_on: [backend]
+
+volumes:
+  pgdata:

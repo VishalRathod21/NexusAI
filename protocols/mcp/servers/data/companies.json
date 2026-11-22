@@ -1,0 +1,126 @@
+{
+  "_note": "Small curated snapshot for demonstration. Coarse, slow-changing facts only. Confirm against each company's own website before relying on any entry.",
+  "as_of": "2026",
+  "companies": [
+    {
+      "name": "Darwinbox",
+      "category": "hr_tech",
+      "region": "india",
+      "headquarters": "Hyderabad, India",
+      "founded": 2015,
+      "positioning": "Cloud HCM suite covering the employee lifecycle, aimed at large and fast-growing enterprises.",
+      "target_customers": "Mid-sized to large enterprises, mainly in Asia",
+      "website": "https://darwinbox.com"
+    },
+    {
+      "name": "Keka",
+      "category": "hr_tech",
+      "region": "india",
+      "headquarters": "Hyderabad, India",
+      "founded": 2015,
+      "positioning": "HR and payroll platform with an emphasis on ease of use for growing companies.",
+      "target_customers": "Small and mid-sized businesses",
+      "website": "https://www.keka.com"
+    },
+    {
+      "name": "greytHR",
+      "category": "hr_tech",
+      "region": "india",
+      "headquarters": "Bengaluru, India",
+      "founded": 1994,
+      "positioning": "Payroll and HR software with strong Indian statutory compliance coverage (from Greytip Software).",
+      "target_customers": "Small and mid-sized businesses",
+      "website": "https://www.greythr.com"
+    },
+    {
+      "name": "Zoho People",
+      "category": "hr_tech",
+      "region": "india",
+      "headquarters": "Chennai, India",
+      "founded": null,
+      "positioning": "HR management product inside the wider Zoho business software suite.",
+      "target_customers": "Small and mid-sized businesses, especially existing Zoho users",
+      "website": "https://www.zoho.com/people/"
+    },
+    {
+      "name": "Zimyo",
+      "category": "hr_tech",
+      "region": "india",
+      "headquarters": "Gurugram, India",
+      "founded": 2018,
+      "positioning": "HRMS and payroll platform with employee engagement features.",
+      "target_customers": "Small and mid-sized businesses",
+      "website": "https://www.zimyo.com"
+    },
+    {
+      "name": "HROne",
+      "category": "hr_tech",
+      "region": "india",
+      "headquarters": "Noida, India",
+      "founded": null,
+      "positioning": "HCM suite focused on automating HR processes for mid-market companies.",
+      "target_customers": "Mid-sized businesses",
+      "website": "https://hrone.cloud"
+    },
+    {
+      "name": "PeopleStrong",
+      "category": "hr_tech",
+      "region": "india",
+      "headquarters": "Gurugram, India",
+      "founded": 2005,
+      "positioning": "Enterprise HR technology covering talent acquisition, HCM and payroll.",
+      "target_customers": "Large enterprises in Asia",
+      "website": "https://www.peoplestrong.com"
+    },
+    {
+      "name": "Workday",
+      "category": "hr_tech",
+      "region": "global",
+      "headquarters": "Pleasanton, California, USA",
+      "founded": 2005,
+      "positioning": "Enterprise cloud platform for human capital management and finance.",
+      "target_customers": "Large enterprises",
+      "website": "https://www.workday.com"
+    },
+    {
+      "name": "BambooHR",
+      "category": "hr_tech",
+      "region": "global",
+      "headquarters": "Lindon, Utah, USA",
+      "founded": 2008,
+      "positioning": "HR information system built for small and mid-sized companies.",
+      "target_customers": "Small and mid-sized businesses",
+      "website": "https://www.bamboohr.com"
+    },
+    {
+      "name": "Rippling",
+      "category": "hr_tech",
+      "region": "global",
+      "headquarters": "San Francisco, California, USA",
+      "founded": 2016,
+      "positioning": "Workforce platform that combines HR, IT and finance on one employee record.",
+      "target_customers": "Small businesses to mid-market",
+      "website": "https://www.rippling.com"
+    },
+    {
+      "name": "Gusto",
+      "category": "hr_tech",
+      "region": "global",
+      "headquarters": "San Francisco, California, USA",
+      "founded": 2011,
+      "positioning": "Payroll, benefits and HR for small businesses.",
+      "target_customers": "Small businesses",
+      "website": "https://gusto.com"
+    },
+    {
+      "name": "Deel",
+      "category": "hr_tech",
+      "region": "global",
+      "headquarters": "San Francisco, California, USA",
+      "founded": 2019,
+      "positioning": "Global payroll, contractor payments and employer-of-record services.",
+      "target_customers": "Companies hiring across countries",
+      "website": "https://www.deel.com"
+    }
+  ]
+}

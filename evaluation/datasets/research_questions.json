@@ -1,0 +1,13 @@
+{
+  "_note": "Fixed evaluation set. `fixture` marks questions the bundled synthetic corpus can answer; the others need live web search (--web ddgs).",
+  "questions": [
+    {"id": "q01", "fixture": true, "query": "I want to launch an AI-powered HR SaaS platform in India. Analyze the market, identify competitors, understand customer demand, and recommend a business strategy."},
+    {"id": "q02", "fixture": true, "query": "We plan to build payroll and compliance software for small businesses in India. Who are the competitors and what do customers struggle with?"},
+    {"id": "q03", "fixture": true, "query": "Evaluate the opportunity for an AI assistant that answers employee HR policy questions for mid-sized companies in India."},
+    {"id": "q04", "fixture": true, "query": "Analyze the market for cloud HRMS tools aimed at startups under 50 employees in India and recommend a positioning."},
+    {"id": "q05", "fixture": true, "query": "I want to start an HR analytics SaaS that predicts employee attrition. What is the demand and who else offers this?"},
+    {"id": "q06", "fixture": false, "query": "I want to launch a subscription meal-kit delivery service in Bengaluru. Analyze the market, competitors and customer demand."},
+    {"id": "q07", "fixture": false, "query": "We plan to open an electric scooter rental business for college campuses in Southeast Asia. Assess the market and risks."},
+    {"id": "q08", "fixture": false, "query": "Evaluate the opportunity for a B2B invoicing and payments platform for freelancers in Europe."}
+  ]
+}
