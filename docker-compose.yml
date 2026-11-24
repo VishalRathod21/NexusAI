@@ -138,7 +138,7 @@ services:
       # Set to true when the site is served over HTTPS.
       COOKIE_SECURE: ${COOKIE_SECURE:-false}
     ports:
-      - "8000:8000"
+      - "${BACKEND_PORT:-8008}:8000"
     depends_on:
       postgres:
         condition: service_healthy
@@ -158,7 +158,7 @@ services:
     image: nexusai-frontend:latest
     restart: unless-stopped
     ports:
-      - "5173:80"
+      - "${FRONTEND_PORT:-5173}:80"
     depends_on: [backend]
 
 volumes:
